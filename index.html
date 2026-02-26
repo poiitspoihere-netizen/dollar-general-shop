@@ -1,21 +1,8 @@
-
-<!--
-Dollar General - SquidSMP Shop
-Open Source Project
-
-Licensed under the MIT License.
-You are free to view, copy, and modify this code.
-
-No personal data is stored.
-All submissions go directly to a Discord webhook.
-
-GitHub Repository:
-https://github.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME
--->
-
+<!DOCTYPE html>
 <html>
 <head>
     <title>Dollar General - SquidSMP</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body {
             background: linear-gradient(to bottom, #0f0f0f, #1b1b1b);
@@ -26,9 +13,10 @@ https://github.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME
         .container {
             background-color: #1a1a1a;
             padding: 30px;
-            width: 450px;
+            width: 90%;
+            max-width: 500px;
             margin: auto;
-            margin-top: 50px;
+            margin-top: 40px;
             border: 2px solid #00ff88;
             border-radius: 12px;
             box-shadow: 0 0 20px #00ff88;
@@ -50,94 +38,124 @@ https://github.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME
             font-weight: bold;
             border-radius: 6px;
         }
-        button:hover { background-color: #00cc66; }
-        #priceDisplay { margin-top: 10px; font-size: 18px; }
-
+        button:hover {
+            background-color: #00cc66;
+        }
+        #priceDisplay {
+            margin-top: 10px;
+            font-size: 18px;
+        }
         .footer {
             margin-top: 20px;
             font-size: 12px;
             color: #888;
         }
-
         .footer a {
             color: #00ff88;
             text-decoration: none;
         }
-
-        .footer a:hover {
-            text-decoration: underline;
-        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🛒 Dollar General</h1>
-        <p>SquidSMP Smart Order Form</p>
 
-        <!-- Open Source Notice -->
-        <p style="font-size: 13px; color: #aaa;">
-            🔓 This website is open source and safe.
-            <br>
-            <a href="https://github.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME" target="_blank" style="color:#00ff88;">
-                View Source Code on GitHub
-            </a>
-        </p>
+<div class="container">
+    <h1>🛒 Dollar General</h1>
+    <p>Secure SquidSMP Order Form</p>
 
-        <form id="shopForm">
-            <input type="text" id="username" placeholder="Minecraft Username" required>
-            <input type="number" id="xcoord" placeholder="X Coordinate" required>
-            <input type="number" id="zcoord" placeholder="Z Coordinate" required>
+    <form id="shopForm">
+        <input type="text" id="username" placeholder="Minecraft Username" required>
+        <input type="number" id="xcoord" placeholder="X Coordinate" required>
+        <input type="number" id="zcoord" placeholder="Z Coordinate" required>
 
-            <select id="item" required>
-                <option value="">Select Item</option>
-                <option value=".5">Dirt</option>
-                <option value=".4">Cobblestone</option>
-                <option value=".4">Stone</option>
-                <option value=".5">Oak Logs</option>
-                <option value=".5">Spruce Logs</option>
-                <option value=".5">Sand</option>
-                <option value=".5">Glass</option>
-                <option value=".5">Gravel</option>
-                <option value=".5">Bricks</option>
-                <option value=".5">Terracotta</option>
-                <option value=".4">Wheat</option>
-                <option value=".4">Coal</option>
-                <option value="1">Iron Ingot</option>
-                <option value="1">Redstone</option>
-                <option value="1">Lapis Lazuli</option>
-                <option value="1">Copper Ingot</option>
-                <option value="1">Quartz</option>
-                <option value="1">Slimeball</option>
-                <option value="1">Glowstone</option>
-                <option value="1">Prismarine</option>
-                <option value="1">Amethyst Shard</option>
-                <option value="1">Moss Block</option>
-                <option value="5000">Diamond</option>
-                <option value="4">Emerald</option>
-                <option value="4">Blaze Rod</option>
-                <option value="4">Ender Pearl</option>
-                <option value="8">Golden Apple</option>
-                <option value="4">Obsidian</option>
-                <option value="4">Experience Bottle</option>
-                <option value="10">Enchanted Book</option>
-                <option value="5">Ancient Debris</option>
-                <option value="5">Netherite Scrap</option>
-                <option value="15">Elytra</option>
-                <option value="8">Totem of Undying</option>
-                <option value="5">Shulker Shell</option>
-                <option value="20">Wither Skeleton Skull</option>
-                <option value="30">Nether Star</option>
-                <option value="40">Beacon</option>
-            </select>
+        <select id="item" required>
+            <option value="">Select Item</option>
+            <option value="0.5">Dirt</option>
+            <option value="0.4">Cobblestone</option>
+            <option value="1">Iron Ingot</option>
+            <option value="4">Emerald</option>
+            <option value="5">Netherite Scrap</option>
+            <option value="15">Elytra</option>
+            <option value="40">Beacon</option>
+        </select>
 
-            <input type="number" id="quantity" placeholder="Quantity" required>
-            <textarea id="notes" placeholder="Extra Notes (optional)"></textarea>
+        <input type="number" id="quantity" placeholder="Quantity" required>
+        <textarea id="notes" placeholder="Extra Notes (optional)"></textarea>
 
-            <div id="priceDisplay">Total Cost: 0 Diamonds</div>
-            <button type="submit">Submit Order</button>
-        </form>
+        <div id="priceDisplay">Total Cost: 0 Diamonds</div>
+        <button type="submit">Submit Order</button>
+    </form>
 
-        <div class="footer">
-            Version 1.0.0 | MIT Licensed | No data stored
-        </div>
+    <div class="footer">
+        Secure Backend Enabled | Webhook Hidden | 1hr Cooldown Active
     </div>
+</div>
+
+<script>
+const WORKER_URL = "https://your-worker-name.your-subdomain.workers.dev";
+
+function calculatePrice() {
+    const tierPrice = parseFloat(document.getElementById("item").value);
+    const quantity = parseFloat(document.getElementById("quantity").value);
+    const x = parseFloat(document.getElementById("xcoord").value);
+    const z = parseFloat(document.getElementById("zcoord").value);
+
+    if (!tierPrice || !quantity || isNaN(x) || isNaN(z)) return 0;
+
+    let baseCost = tierPrice * quantity;
+
+    if (quantity > 64) baseCost *= 1.2;
+    else if (quantity > 32) baseCost *= 1.1;
+    else if (quantity > 16) baseCost *= 1.05;
+
+    const distance = Math.sqrt((x*x) + (z*z));
+    let distanceMultiplier = 1;
+
+    if (distance > 6000) distanceMultiplier = 1.5;
+    else if (distance > 3000) distanceMultiplier = 1.25;
+    else if (distance > 1000) distanceMultiplier = 1.1;
+
+    const totalCost = Math.round(baseCost * distanceMultiplier);
+
+    document.getElementById("priceDisplay").innerText =
+        "Total Cost: " + totalCost + " Diamonds";
+
+    return totalCost;
+}
+
+document.querySelectorAll("input, select, textarea").forEach(el => {
+    el.addEventListener("input", calculatePrice);
+});
+
+document.getElementById("shopForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const username = document.getElementById("username").value.trim();
+    const x = parseFloat(document.getElementById("xcoord").value);
+    const z = parseFloat(document.getElementById("zcoord").value);
+    const itemName = document.getElementById("item").selectedOptions[0].text;
+    const quantity = parseFloat(document.getElementById("quantity").value);
+    const notes = document.getElementById("notes").value || "None";
+
+    fetch(WORKER_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            username,
+            x,
+            z,
+            item: itemName,
+            quantity,
+            notes
+        })
+    })
+    .then(res => res.text())
+    .then(data => alert(data))
+    .catch(() => alert("Error sending order"));
+
+    this.reset();
+    document.getElementById("priceDisplay").innerText = "Total Cost: 0 Diamonds";
+});
+</script>
+
+</body>
+</html>
