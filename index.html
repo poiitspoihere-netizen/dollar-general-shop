@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Dollar General - SquidSMP</title>
+<style>
+body {
+    background: linear-gradient(to bottom, #0f0f0f, #1b1b1b);
+    color: #00ff88;
+    font-family: 'Courier New', monospace;
+    text-align: center;
+}
+
+.container {
+    background-color: #1a1a1a;
+    padding: 30px;
+    width: 400px;
+    margin: auto;
+    margin-top: 60px;
+    border: 2px solid #00ff88;
+    border-radius: 12px;
+    box-shadow: 0 0 20px #00ff88;
+}
+
+h1 {
+    margin-bottom: 5px;
+}
+
+input, textarea {
+    width: 90%;
+    padding: 10px;
+    margin: 10px;
+    background-color: #0f0f0f;
+    border: 1px solid #00ff88;
+    color: white;
+    border-radius: 6px;
+}
+
+button {
+    background-color: #00ff88;
+    border: none;
+    padding: 12px 20px;
+    cursor: pointer;
+    font-weight: bold;
+    border-radius: 6px;
+}
+
+button:hover {
+    background-color: #00cc66;
+}
+
+#status {
+    margin-top: 15px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<h1>🛒 Dollar General</h1>
+<p>SquidSMP Shop Order Form</p>
+
+<form id="shopForm">
+<input type="text" id="username" placeholder="Minecraft Username" required>
+<input type="text" id="coords" placeholder="Coordinates (X Y Z)" required>
+<input type="text" id="item" placeholder="Item Wanted" required>
+<input type="number" id="quantity" placeholder="Quantity" required>
+<textarea id="notes" placeholder="Extra Notes (optional)"></textarea>
+<br>
+<button type="submit">Submit Order</button>
+</form>
+
+<p id="status"></p>
+</div>
+
+<script>
+const webhookURL = "PASTE_YOUR_WEBHOOK_HERE";
+
+document.getElementById("shopForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const username = document.getElementById("username").value;
+    const coords = document.getElementById("coords").value;
+    const item = document.getElementById("item").value;
+    const quantity = document.getElementById("quantity").value;
+    const notes = document.getElementById("notes").value;
+
+    const message = {
+        content: `🛒 **New Dollar General Order!**
+        
+👤 Username: ${username}
+📍 Coords: ${coords}
+📦 Item: ${item}
+🔢 Quantity: ${quantity}
+📝 Notes: ${notes}`
+    };
+
+    fetch(webhookURL, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(message)
+    }).then(() => {
+        document.getElementById("status").innerText = "✅ Order Submitted!";
+        document.getElementById("shopForm").reset();
+    }).catch(() => {
+        document.getElementById("status").innerText = "❌ Error sending order.";
+    });
+});
+</script>
+
+</body>
+</html>
