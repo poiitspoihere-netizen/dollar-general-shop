@@ -1,223 +1,228 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Dollar General - SquidSMP</title>
-<style>
-body {
-    background: linear-gradient(to bottom, #0f0f0f, #1b1b1b);
-    color: #00ff88;
-    font-family: 'Courier New', monospace;
-    text-align: center;
-}
-.container {
-    background-color: #1a1a1a;
-    padding: 30px;
-    width: 420px;
-    margin: auto;
-    margin-top: 50px;
-    border: 2px solid #00ff88;
-    border-radius: 12px;
-    box-shadow: 0 0 20px #00ff88;
-}
-input, select {
-    width: 90%;
-    padding: 10px;
-    margin: 10px;
-    background-color: #0f0f0f;
-    border: 1px solid #00ff88;
-    color: white;
-    border-radius: 6px;
-}
-button {
-    background-color: #00ff88;
-    border: none;
-    padding: 12px 20px;
-    cursor: pointer;
-    font-weight: bold;
-    border-radius: 6px;
-}
-button:hover { background-color: #00cc66; }
-#priceDisplay { margin-top: 10px; font-size: 18px; }
-</style>
+    <title>Dollar General - SquidSMP</title>
+    <style>
+        body {
+            background: linear-gradient(to bottom, #0f0f0f, #1b1b1b);
+            color: #00ff88;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+        }
+        .container {
+            background-color: #1a1a1a;
+            padding: 30px;
+            width: 450px;
+            margin: auto;
+            margin-top: 50px;
+            border: 2px solid #00ff88;
+            border-radius: 12px;
+            box-shadow: 0 0 20px #00ff88;
+        }
+        input, select, textarea {
+            width: 90%;
+            padding: 10px;
+            margin: 10px;
+            background-color: #0f0f0f;
+            border: 1px solid #00ff88;
+            color: white;
+            border-radius: 6px;
+        }
+        button {
+            background-color: #00ff88;
+            border: none;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 6px;
+        }
+        button:hover { background-color: #00cc66; }
+        #priceDisplay { margin-top: 10px; font-size: 18px; }
+    </style>
 </head>
 <body>
+    <div class="container">
+        <h1>🛒 Dollar General</h1>
+        <p>SquidSMP Smart Order Form</p>
+        <form id="shopForm">
+            <input type="text" id="username" placeholder="Minecraft Username" required>
+            <input type="number" id="xcoord" placeholder="X Coordinate" required>
+            <input type="number" id="zcoord" placeholder="Z Coordinate" required>
 
-<div class="container">
-<h1>🛒 Dollar General</h1>
-<p>SquidSMP Smart Order Form</p>
+            <select id="item" required>
+                <option value="">Select Item</option>
+                <!-- Common -->
+                <option value="1">Dirt</option>
+                <option value="1">Cobblestone</option>
+                <option value="1">Stone</option>
+                <option value="1">Oak Logs</option>
+                <option value="1">Spruce Logs</option>
+                <option value="1">Sand</option>
+                <option value="1">Glass</option>
+                <option value="1">Gravel</option>
+                <option value="1">Bricks</option>
+                <option value="1">Terracotta</option>
+                <option value="1">Wheat</option>
+                <option value="1">Coal</option>
+                <!-- Uncommon -->
+                <option value="3">Iron Ingot</option>
+                <option value="3">Redstone</option>
+                <option value="3">Lapis Lazuli</option>
+                <option value="3">Copper Ingot</option>
+                <option value="3">Quartz</option>
+                <option value="3">Slimeball</option>
+                <option value="3">Glowstone</option>
+                <option value="3">Prismarine</option>
+                <option value="3">Amethyst Shard</option>
+                <option value="3">Moss Block</option>
+                <!-- Rare -->
+                <option value="8">Diamond</option>
+                <option value="8">Emerald</option>
+                <option value="8">Blaze Rod</option>
+                <option value="8">Ender Pearl</option>
+                <option value="8">Golden Apple</option>
+                <option value="8">Obsidian</option>
+                <option value="8">Experience Bottle</option>
+                <option value="8">Enchanted Book</option>
+                <option value="8">Ancient Debris</option>
+                <!-- Very Rare -->
+                <option value="20">Netherite Scrap</option>
+                <option value="20">Elytra</option>
+                <option value="20">Totem of Undying</option>
+                <option value="20">Shulker Shell</option>
+                <option value="20">Wither Skeleton Skull</option>
+                <option value="20">Nether Star</option>
+                <option value="20">Beacon</option>
+            </select>
 
-<form id="shopForm">
+            <input type="number" id="quantity" placeholder="Quantity" required>
+            <textarea id="notes" placeholder="Extra Notes (optional)"></textarea>
 
-<input type="text" id="username" placeholder="Minecraft Username" required>
-<input type="number" id="xcoord" placeholder="X Coordinate" required>
-<input type="number" id="zcoord" placeholder="Z Coordinate" required>
+            <div id="priceDisplay">Total Cost: 0 Diamonds</div>
+            <button type="submit">Submit Order</button>
+        </form>
+    </div>
 
-<select id="item" required>
-<option value="">Select Item</option>
+    <script>
+    const webhookURL = "PASTE_YOUR_WEBHOOK_HERE";
+    const COOLDOWN_TIME = 60 * 60 * 1000; // 1 hour
 
-<option value="1">Dirt</option>
-<option value="1">Cobblestone</option>
-<option value="1">Oak Logs</option>
-<option value="1">Sand</option>
-<option value="1">Glass</option>
-<option value="1">Wheat</option>
-<option value="1">Coal</option>
+    function calculatePrice() {
+        const tierPrice = parseFloat(document.getElementById("item").value);
+        const quantity = parseFloat(document.getElementById("quantity").value);
+        const x = parseFloat(document.getElementById("xcoord").value);
+        const z = parseFloat(document.getElementById("zcoord").value);
 
-<option value="3">Iron Ingot</option>
-<option value="3">Redstone</option>
-<option value="3">Lapis Lazuli</option>
-<option value="3">Copper Ingot</option>
-<option value="3">Quartz</option>
-<option value="3">Slimeball</option>
+        if (!tierPrice || !quantity || isNaN(x) || isNaN(z)) return 0;
 
-<option value="8">Diamond</option>
-<option value="8">Emerald</option>
-<option value="8">Blaze Rod</option>
-<option value="8">Ender Pearl</option>
-<option value="8">Golden Apple</option>
-<option value="8">Obsidian</option>
+        let baseCost = tierPrice * quantity;
 
-<option value="20">Netherite Scrap</option>
-<option value="20">Elytra</option>
-<option value="20">Totem of Undying</option>
-<option value="20">Shulker Shell</option>
-<option value="20">Wither Skeleton Skull</option>
+        if (quantity > 64) baseCost *= 1.2;
+        else if (quantity > 32) baseCost *= 1.1;
+        else if (quantity > 16) baseCost *= 1.05;
 
-</select>
+        const distance = Math.sqrt((x*x) + (z*z));
+        let distanceMultiplier = 1;
 
-<input type="number" id="quantity" placeholder="Quantity" required>
+        if (distance > 6000) distanceMultiplier = 1.5;
+        else if (distance > 3000) distanceMultiplier = 1.25;
+        else if (distance > 1000) distanceMultiplier = 1.1;
 
-<div id="priceDisplay">Total Cost: 0 Diamonds</div>
+        const totalCost = Math.round(baseCost * distanceMultiplier);
 
-<button type="submit">Submit Order</button>
+        document.getElementById("priceDisplay").innerText =
+            "Total Cost: " + totalCost + " Diamonds";
 
-</form>
-</div>
+        return totalCost;
+    }
 
-<script>
-const webhookURL = "https://discord.com/api/webhooks/1476368879193297078/99izeH2ULs5_lSVa9y6rJaaUnxAAwdEF1XVyO2IF0D9L5Y2_XMl7VXvtq8wmZJVVjnk2";
-const COOLDOWN_TIME = 60 * 60 * 1000; // 1 hour
+    function isSuspicious(x, z, quantity, tierPrice, notes) {
+        if (quantity <= 0) return true;
+        if (Math.abs(x) > 30000 || Math.abs(z) > 30000) return true;
+        if (quantity > 256) return true;
+        if (tierPrice == 20 && quantity > 10) return true;
 
-function calculatePrice() {
-    const tierPrice = parseFloat(document.getElementById("item").value);
-    const quantity = parseFloat(document.getElementById("quantity").value);
-    const x = parseFloat(document.getElementById("xcoord").value);
-    const z = parseFloat(document.getElementById("zcoord").value);
-
-    if (!tierPrice || !quantity || isNaN(x) || isNaN(z)) return 0;
-
-    let baseCost = tierPrice * quantity;
-
-    if (quantity > 64) baseCost *= 1.2;
-    else if (quantity > 32) baseCost *= 1.1;
-    else if (quantity > 16) baseCost *= 1.05;
-
-    const distance = Math.sqrt((x*x) + (z*z));
-    let distanceMultiplier = 1;
-
-    if (distance > 6000) distanceMultiplier = 1.5;
-    else if (distance > 3000) distanceMultiplier = 1.25;
-    else if (distance > 1000) distanceMultiplier = 1.1;
-
-    const totalCost = Math.round(baseCost * distanceMultiplier);
-
-    document.getElementById("priceDisplay").innerText =
-        "Total Cost: " + totalCost + " Diamonds";
-
-    return totalCost;
-}
-
-function isSuspicious(x, z, quantity, tierPrice, notes) {
-    if (quantity <= 0) return true;
-    if (Math.abs(x) > 30000 || Math.abs(z) > 30000) return true;
-    if (quantity > 256) return true;
-    if (tierPrice == 20 && quantity > 10) return true;
-
-    const bannedWords = ["hack", "free", "admin abuse"];
-    for (let word of bannedWords) {
-        if (notes.toLowerCase().includes(word)) {
-            return true;
+        const bannedWords = ["hack", "free", "admin abuse"];
+        for (let word of bannedWords) {
+            if (notes.toLowerCase().includes(word)) {
+                return true;
+            }
         }
+
+        return false;
     }
 
-    return false;
-}
+    // DEVICE-BASED COOLDOWN
+    function checkCooldown() {
+        const lastOrderTime = localStorage.getItem("device_cooldown");
+        if (!lastOrderTime) return false;
 
-// DEVICE-BASED COOLDOWN (cannot bypass by changing username)
-function checkCooldown() {
-    const lastOrderTime = localStorage.getItem("device_cooldown");
-    if (!lastOrderTime) return false;
-
-    const timePassed = Date.now() - parseInt(lastOrderTime);
-    return timePassed < COOLDOWN_TIME;
-}
-
-function getRemainingTime() {
-    const lastOrderTime = localStorage.getItem("device_cooldown");
-    const timePassed = Date.now() - parseInt(lastOrderTime);
-    const timeLeft = COOLDOWN_TIME - timePassed;
-    return Math.ceil(timeLeft / 60000);
-}
-
-function setCooldown() {
-    localStorage.setItem("device_cooldown", Date.now());
-}
-
-// Auto update price
-document.querySelectorAll("input, select, textarea").forEach(element => {
-    element.addEventListener("input", calculatePrice);
-});
-
-document.getElementById("shopForm").addEventListener("submit", function(e) {
-    e.preventDefault();
-
-    if (checkCooldown()) {
-        const minutesLeft = getRemainingTime();
-        alert("You must wait " + minutesLeft + " more minutes before placing another order.");
-        return;
+        const timePassed = Date.now() - parseInt(lastOrderTime);
+        return timePassed < COOLDOWN_TIME;
     }
 
-    const username = document.getElementById("username").value.trim();
-    const x = parseFloat(document.getElementById("xcoord").value);
-    const z = parseFloat(document.getElementById("zcoord").value);
-    const itemName = document.getElementById("item").selectedOptions[0].text;
-    const tierPrice = parseFloat(document.getElementById("item").value);
-    const quantity = parseFloat(document.getElementById("quantity").value);
-    const notes = document.getElementById("notes").value || "None";
+    function getRemainingTime() {
+        const lastOrderTime = localStorage.getItem("device_cooldown");
+        const timePassed = Date.now() - parseInt(lastOrderTime);
+        const timeLeft = COOLDOWN_TIME - timePassed;
+        return Math.ceil(timeLeft / 60000);
+    }
 
-    const totalCost = calculatePrice();
-    const flagged = isSuspicious(x, z, quantity, tierPrice, notes);
+    function setCooldown() {
+        localStorage.setItem("device_cooldown", Date.now());
+    }
 
-    const message = {
-        content: `${flagged ? "🚨 **FLAGGED ORDER** 🚨" : "🛒 **New Order**"}
-        
+    // Auto price update
+    document.querySelectorAll("input, select, textarea").forEach(el => {
+        el.addEventListener("input", calculatePrice);
+    });
+
+    document.getElementById("shopForm").addEventListener("submit", function(e) {
+        e.preventDefault();
+
+        if (checkCooldown()) {
+            const minutesLeft = getRemainingTime();
+            alert("You must wait " + minutesLeft + " more minutes before placing another order.");
+            return;
+        }
+
+        const username = document.getElementById("username").value.trim();
+        const x = parseFloat(document.getElementById("xcoord").value);
+        const z = parseFloat(document.getElementById("zcoord").value);
+        const itemName = document.getElementById("item").selectedOptions[0].text;
+        const tierPrice = parseFloat(document.getElementById("item").value);
+        const quantity = parseFloat(document.getElementById("quantity").value);
+        const notes = document.getElementById("notes").value || "None";
+
+        const totalCost = calculatePrice();
+        const flagged = isSuspicious(x, z, quantity, tierPrice, notes);
+
+        const message = {
+            content: `${flagged ? "🚨 **FLAGGED ORDER** 🚨" : "🛒 **New Order**"}
+            
 👤 Username: ${username}
 📍 Location: ${x}, ${z}
 📦 Item: ${itemName}
 🔢 Quantity: ${quantity}
 💎 Total Cost: ${totalCost} Diamonds
 📝 Notes: ${notes}`
-    };
+        };
 
-    fetch(webhookURL, {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify(message)
+        fetch(webhookURL, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(message)
+        });
+
+        setCooldown();
+
+        alert(flagged ?
+            "Order submitted but flagged for review." :
+            "Order submitted! You must wait 1 hour before placing another order."
+        );
+
+        document.getElementById("shopForm").reset();
+        document.getElementById("priceDisplay").innerText =
+            "Total Cost: 0 Diamonds";
     });
-
-    setCooldown();
-
-    alert(flagged ?
-        "Order submitted but flagged for review." :
-        "Order submitted! You must wait 1 hour before placing another order."
-    );
-
-    document.getElementById("shopForm").reset();
-    document.getElementById("priceDisplay").innerText =
-        "Total Cost: 0 Diamonds";
-});
-</script>;
-</script>
-
-</body>
-</html>
+    </script>
