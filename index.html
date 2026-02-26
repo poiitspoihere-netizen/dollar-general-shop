@@ -2,7 +2,6 @@
 <html>
 <head>
     <title>Dollar General - SquidSMP</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body {
             background: linear-gradient(to bottom, #0f0f0f, #1b1b1b);
@@ -13,10 +12,9 @@
         .container {
             background-color: #1a1a1a;
             padding: 30px;
-            width: 90%;
-            max-width: 500px;
+            width: 450px;
             margin: auto;
-            margin-top: 40px;
+            margin-top: 50px;
             border: 2px solid #00ff88;
             border-radius: 12px;
             box-shadow: 0 0 20px #00ff88;
@@ -45,22 +43,13 @@
             margin-top: 10px;
             font-size: 18px;
         }
-        .footer {
-            margin-top: 20px;
-            font-size: 12px;
-            color: #888;
-        }
-        .footer a {
-            color: #00ff88;
-            text-decoration: none;
-        }
     </style>
 </head>
-<body>
 
+<body>
 <div class="container">
     <h1>🛒 Dollar General</h1>
-    <p>Secure SquidSMP Order Form</p>
+    <p>SquidSMP Smart Order Form</p>
 
     <form id="shopForm">
         <input type="text" id="username" placeholder="Minecraft Username" required>
@@ -69,12 +58,51 @@
 
         <select id="item" required>
             <option value="">Select Item</option>
+
+            <!-- Common -->
             <option value="0.5">Dirt</option>
             <option value="0.4">Cobblestone</option>
+            <option value="0.4">Stone</option>
+            <option value="0.5">Oak Logs</option>
+            <option value="0.5">Spruce Logs</option>
+            <option value="0.5">Sand</option>
+            <option value="0.5">Glass</option>
+            <option value="0.5">Gravel</option>
+            <option value="0.5">Bricks</option>
+            <option value="0.5">Terracotta</option>
+            <option value="0.4">Wheat</option>
+            <option value="0.4">Coal</option>
+
+            <!-- Uncommon -->
             <option value="1">Iron Ingot</option>
+            <option value="1">Redstone</option>
+            <option value="1">Lapis Lazuli</option>
+            <option value="1">Copper Ingot</option>
+            <option value="1">Quartz</option>
+            <option value="1">Slimeball</option>
+            <option value="1">Glowstone</option>
+            <option value="1">Prismarine</option>
+            <option value="1">Amethyst Shard</option>
+            <option value="1">Moss Block</option>
+
+            <!-- Rare -->
+            <option value="5000">Diamond</option>
             <option value="4">Emerald</option>
+            <option value="4">Blaze Rod</option>
+            <option value="4">Ender Pearl</option>
+            <option value="8">Golden Apple</option>
+            <option value="4">Obsidian</option>
+            <option value="4">Experience Bottle</option>
+            <option value="10">Enchanted Book</option>
+            <option value="5">Ancient Debris</option>
+
+            <!-- Very Rare -->
             <option value="5">Netherite Scrap</option>
             <option value="15">Elytra</option>
+            <option value="8">Totem of Undying</option>
+            <option value="5">Shulker Shell</option>
+            <option value="20">Wither Skeleton Skull</option>
+            <option value="30">Nether Star</option>
             <option value="40">Beacon</option>
         </select>
 
@@ -84,14 +112,11 @@
         <div id="priceDisplay">Total Cost: 0 Diamonds</div>
         <button type="submit">Submit Order</button>
     </form>
-
-    <div class="footer">
-        Secure Backend Enabled | Webhook Hidden | 1hr Cooldown Active
-    </div>
 </div>
 
 <script>
-const WORKER_URL = "https://your-worker-name.your-subdomain.workers.dev";
+const webhookURL = "PASTE_NEW_WEBHOOK_HERE";
+const COOLDOWN_TIME = 60 * 60 * 1000; // 1 hour
 
 function calculatePrice() {
     const tierPrice = parseFloat(document.getElementById("item").value);
@@ -122,6 +147,36 @@ function calculatePrice() {
     return totalCost;
 }
 
+function isSuspicious(x, z, quantity, tierPrice, notes) {
+    if (quantity <= 0) return true;
+    if (Math.abs(x) > 30000 || Math.abs(z) > 30000) return true;
+    if (quantity > 256) return true;
+
+    const bannedWords = ["hack", "free", "admin abuse"];
+    for (let word of bannedWords) {
+        if (notes.toLowerCase().includes(word)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function checkCooldown() {
+    const lastOrderTime = localStorage.getItem("device_cooldown");
+    if (!lastOrderTime) return false;
+    return Date.now() - parseInt(lastOrderTime) < COOLDOWN_TIME;
+}
+
+function getRemainingTime() {
+    const lastOrderTime = localStorage.getItem("device_cooldown");
+    const timeLeft = COOLDOWN_TIME - (Date.now() - parseInt(lastOrderTime));
+    return Math.ceil(timeLeft / 60000);
+}
+
+function setCooldown() {
+    localStorage.setItem("device_cooldown", Date.now());
+}
+
 document.querySelectorAll("input, select, textarea").forEach(el => {
     el.addEventListener("input", calculatePrice);
 });
@@ -129,28 +184,44 @@ document.querySelectorAll("input, select, textarea").forEach(el => {
 document.getElementById("shopForm").addEventListener("submit", function(e) {
     e.preventDefault();
 
+    if (checkCooldown()) {
+        alert("You must wait " + getRemainingTime() + " more minutes.");
+        return;
+    }
+
     const username = document.getElementById("username").value.trim();
     const x = parseFloat(document.getElementById("xcoord").value);
     const z = parseFloat(document.getElementById("zcoord").value);
     const itemName = document.getElementById("item").selectedOptions[0].text;
+    const tierPrice = parseFloat(document.getElementById("item").value);
     const quantity = parseFloat(document.getElementById("quantity").value);
     const notes = document.getElementById("notes").value || "None";
 
-    fetch(WORKER_URL, {
+    const totalCost = calculatePrice();
+    const flagged = isSuspicious(x, z, quantity, tierPrice, notes);
+
+    const message = {
+        content: `${flagged ? "🚨 **FLAGGED ORDER** 🚨" : "🛒 **New Order**"}
+👤 Username: ${username}
+📍 Location: ${x}, ${z}
+📦 Item: ${itemName}
+🔢 Quantity: ${quantity}
+💎 Total Cost: ${totalCost} Diamonds
+📝 Notes: ${notes}`
+    };
+
+    fetch(webhookURL, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            username,
-            x,
-            z,
-            item: itemName,
-            quantity,
-            notes
-        })
-    })
-    .then(res => res.text())
-    .then(data => alert(data))
-    .catch(() => alert("Error sending order"));
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(message)
+    });
+
+    setCooldown();
+
+    alert(flagged
+        ? "Order submitted but flagged for review."
+        : "Order submitted! 1 hour cooldown started."
+    );
 
     this.reset();
     document.getElementById("priceDisplay").innerText = "Total Cost: 0 Diamonds";
